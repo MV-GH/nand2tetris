@@ -1,0 +1,35 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/Register.hdl
+
+/**
+ * 16-bit register:
+ * If load[t] == 1 then out[t+1] = in[t]
+ * else out does not change
+ */
+
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+    Mux16(b=in, sel=load, a[0]=tm0,a[1]=tm1,a[2]=tm2,a[3]=tm3,a[4]=tm4,a[5]=tm5,a[6]=tm6,a[7]=tm7,a[8]=tm8,a[9]=tm9,a[10]=tm10,a[11]=tm11,a[12]=tm12,a[13]=tm13,a[14]=tm14,a[15]=tm15,out=tt, out[0]=t0,out[1]=t1,out[2]=t2,out[3]=t3,out[4]=t4,out[5]=t5,out[6]=t6,out[7]=t7,out[8]=t8,out[9]=t9,out[10]=t10,out[11]=t11,out[12]=t12,out[13]=t13,out[14]=t14,out[15]=t15);
+    DFF(in=t0, out=out[0], out=tm0);
+    DFF(in=t1, out=out[1], out=tm1);
+    DFF(in=t2, out=out[2], out=tm2);
+    DFF(in=t3, out=out[3], out=tm3);
+    DFF(in=t4, out=out[4], out=tm4);
+    DFF(in=t5, out=out[5], out=tm5);
+    DFF(in=t6, out=out[6], out=tm6);
+    DFF(in=t7, out=out[7], out=tm7);
+    DFF(in=t8, out=out[8], out=tm8);
+    DFF(in=t9, out=out[9], out=tm9);
+    DFF(in=t10, out=out[10], out=tm10);
+    DFF(in=t11, out=out[11], out=tm11);
+    DFF(in=t12, out=out[12], out=tm12);
+    DFF(in=t13, out=out[13], out=tm13);
+    DFF(in=t14, out=out[14], out=tm14);
+    DFF(in=t15, out=out[15], out=tm15);
+
+}
