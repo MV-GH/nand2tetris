@@ -10,3 +10,33 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+// reset
+@R2
+M=0
+
+// setup i
+@R1
+D=M
+@i
+M=D
+
+(START)
+    @i
+    D=M
+    @END
+    D;JEQ
+
+    @i
+    M=M-1
+
+
+    @R0
+    D=M
+
+    @R2
+    M=M+D
+    @START
+    0;JMP
+
+(END)
