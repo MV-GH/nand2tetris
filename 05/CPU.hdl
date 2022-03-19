@@ -39,5 +39,47 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // C instruction (https://github.com/AlienKevin/hack-assembler-web#c-instructions)
+    // 1xxA cccc ccdd djjj
+    // x bits arent used, A bit decides if it should retrieve from reg A (0) or M[A] (1) 
+    // c bits are the comp bits used by the alu, j bits represents the jump destintation
+    // d bits are the destination, where it should store the result (A, D, M)
+
+    Mux16(a=instruction, b=outalu, sel=instruction[15], out=outm161);
+    // loads A reg when its an A instrunction (opcode 0)
+    Not(in=instruction[15], out=opcodeA);
+    Or(a=opcodeA, b=instruction[5], out=loadrega);
+    ARegister(in=outm161, load=loadrega, out=outrega, out[0..14]=addressM);
+
+    // only load when C instruct
+    And(a=instruction[4], b=instruction[15], out=loadregd);
+    DRegister(in=outalu, load=loadregd, out=outregd);
+    Mux16(a=outrega, b=inM, sel=instruction[12], out=outm2);    
+    ALU(x=outregd, y=outm2, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outM,out=outalu, zr=zr, ng=ng);
+    
+    // Only write when C instruction
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    // Logic for load, decides depending on the jump bits(j1, j2, j3) and the control bits (zr, ng) if it should jump (load, set the instruction addr of A reg as current)
+    // 000 null => false
+    // 001 JGT => And(Not(ng), Not(zr))
+    // 010 JEQ => zr
+    // 011 JGE => Or(Not(ng), zr)
+    // 100 JLT => ng
+    // 101 JNE => Not(zr)
+    // 110 JLE => Or(ng, zr)
+    // 111 JMP => true
+    Not(in=ng, out=notng);
+    Not(in=zr, out=notzr);
+    And(a=notzr, b=notng, out=jgt);
+    Or(a=notng, b=zr, out=jge);
+    Or(a=ng, b=zr, out=jle);
+    // cant be bothered to make Mux8way
+    Mux8Way16(a=false, b[0]=jgt, c[0]=zr, d[0]=jge, e[0]=ng, f[0]=notzr, g[0]=jle, h=true, sel=instruction[0..2], out[0]=logicload);
+    // Prevent load when A instruction
+    And(a=instruction[15], b=logicload, out=pcload);
+    // if it doesnt jump then it should incr
+    Not(in=pcload, out=notpcload);
+    PC(in=outrega, load=pcload, inc=notpcload, reset=reset, out[0..14]=pc);
+
 }
